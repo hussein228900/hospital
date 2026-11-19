@@ -1,0 +1,1545 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>نظام مستشفى الراعي | العرض التقديمي للعميل UI & UX</title>
+  <!-- Cairo Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      /* Forest Green Palette (inspired by Ritaj Hospital) */
+      --brand-primary: #165b3b;
+      --brand-primary-hover: #1e6b47;
+      --brand-dark: #0d3422;
+      --brand-darker: #092417;
+      --brand-border-dark: #134e30;
+      --brand-soft: #f0fdf4;
+      --brand-soft-border: #bbf7d0;
+      
+      /* Ruby Crimson Accent (from hospital booking card) */
+      --accent-crimson: #b91c1c;
+      --accent-crimson-hover: #dc2626;
+      --accent-crimson-soft: #fef2f2;
+      
+      /* Neutral / Slate */
+      --bg-body: #f8fafc;
+      --bg-surface: #ffffff;
+      --border-color: #e2e8f0;
+      --border-subtle: #edf2f7;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --text-subtle: #94a3b8;
+      
+      --radius-sm: 6px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-card: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-modal: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Cairo', system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-body);
+      color: var(--text-main);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+      font-size: 13px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Presentation Banner on Top */
+    .client-banner {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: #0f172a;
+      color: #f8fafc;
+      padding: 6px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      z-index: 1000;
+      border-bottom: 1px solid #334155;
+    }
+    .client-banner .badge {
+      background: var(--brand-primary);
+      color: #fff;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 700;
+      margin-left: 8px;
+    }
+    .client-banner .actions button {
+      background: #1e293b;
+      color: #cbd5e1;
+      border: 1px solid #475569;
+      padding: 3px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 600;
+      margin-right: 6px;
+      transition: all 0.15s;
+    }
+    .client-banner .actions button:hover {
+      background: #334155;
+      color: #fff;
+    }
+
+    /* Main App Layout */
+    .app-container {
+      display: flex;
+      width: 100%;
+      height: calc(100vh - 34px);
+      margin-top: 34px;
+      overflow: hidden;
+    }
+
+    /* Sidebar - Minimalist, Human-Engineered without Icon Spam */
+    .sidebar {
+      width: 250px;
+      background: var(--brand-dark);
+      color: #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      border-left: 1px solid var(--brand-border-dark);
+      flex-shrink: 0;
+      user-select: none;
+    }
+
+    .sidebar-header {
+      padding: 16px;
+      background: var(--brand-darker);
+      border-bottom: 1px solid var(--brand-border-dark);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-mark {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-md);
+      background: var(--brand-primary);
+      border: 1px solid #228655;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .brand-title {
+      font-weight: 800;
+      font-size: 13px;
+      color: #fff;
+      line-height: 1.2;
+    }
+    .brand-subtitle {
+      font-size: 10px;
+      color: #86efac;
+      margin-top: 2px;
+      font-weight: 500;
+    }
+
+    .nav-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 8px;
+    }
+    .nav-body::-webkit-scrollbar {
+      width: 4px;
+    }
+    .nav-body::-webkit-scrollbar-thumb {
+      background: #185c3b;
+      border-radius: 4px;
+    }
+
+    .nav-section {
+      margin-bottom: 14px;
+    }
+    .nav-section-title {
+      font-size: 10px;
+      font-weight: 700;
+      color: rgba(134, 239, 172, 0.6);
+      padding: 4px 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      color: #cbd5e1;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.12s, color 0.12s;
+      margin-bottom: 2px;
+    }
+    .nav-item:hover {
+      background: rgba(255, 255, 255, 0.06);
+      color: #fff;
+    }
+    .nav-item.active {
+      background: var(--brand-primary);
+      color: #ffffff;
+      font-weight: 700;
+      border-right: 3px solid #4ade80;
+    }
+    .nav-tag {
+      font-size: 9px;
+      background: var(--accent-crimson);
+      color: #fff;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+
+    .sidebar-footer {
+      padding: 12px;
+      background: var(--brand-darker);
+      border-top: 1px solid var(--brand-border-dark);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .user-pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .user-avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: var(--radius-sm);
+      background: var(--brand-primary);
+      color: #fff;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+    }
+    .user-details .uname {
+      font-weight: 700;
+      color: #fff;
+      font-size: 11px;
+      line-height: 1.2;
+    }
+    .user-details .urole {
+      font-size: 10px;
+      color: #86efac;
+    }
+
+    /* Content Area */
+    .main-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--bg-body);
+    }
+
+    /* Top Bar */
+    .topbar {
+      height: 52px;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      flex-shrink: 0;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--brand-soft);
+      color: var(--brand-primary);
+      border: 1px solid var(--brand-soft-border);
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #16a34a;
+    }
+    .date-pill {
+      background: #f1f5f9;
+      color: #475569;
+      border: 1px solid var(--border-color);
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .btn-top {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      padding: 5px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 11px;
+      font-weight: 600;
+      color: #334155;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-top:hover {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+    }
+
+    /* Page View Body */
+    .view-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+    }
+
+    .view-section {
+      display: none;
+    }
+    .view-section.active {
+      display: block;
+      animation: fadeIn 0.2s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Cards & Components */
+    .hero-banner {
+      background: var(--brand-darker);
+      border: 1px solid var(--brand-border-dark);
+      border-radius: var(--radius-lg);
+      padding: 20px 24px;
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .hero-banner h1 {
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+    .hero-banner p {
+      font-size: 11px;
+      color: #a7f3d0;
+    }
+    .hero-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    /* KPI Row */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    .kpi-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 16px 18px;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+    }
+    .kpi-card.accent-red {
+      border-top: 3px solid var(--accent-crimson);
+    }
+    .kpi-card.accent-green {
+      border-top: 3px solid var(--brand-primary);
+    }
+    .kpi-card.accent-slate {
+      border-top: 3px solid #64748b;
+    }
+    .kpi-card.accent-amber {
+      border-top: 3px solid #d97706;
+    }
+    .kpi-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+    .kpi-value {
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--text-main);
+      line-height: 1.2;
+    }
+    .kpi-hint {
+      font-size: 10px;
+      color: var(--text-subtle);
+      margin-top: 4px;
+      font-weight: 500;
+    }
+
+    /* Tables & Filter Bar */
+    .panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .panel-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #fafafa;
+    }
+    .panel-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+    .panel-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 500;
+      margin-top: 2px;
+    }
+
+    .filter-bar {
+      padding: 12px 18px;
+      background: #ffffff;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .search-input {
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 7px 12px;
+      font-size: 11px;
+      width: 260px;
+      outline: none;
+      transition: border 0.15s;
+    }
+    .search-input:focus {
+      border-color: var(--brand-primary);
+    }
+    .select-filter {
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 7px 10px;
+      font-size: 11px;
+      background: #fff;
+      outline: none;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 7px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      transition: background 0.15s;
+    }
+    .btn-primary {
+      background: var(--brand-primary);
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background: var(--brand-primary-hover);
+    }
+    .btn-crimson {
+      background: var(--accent-crimson);
+      color: #fff;
+    }
+    .btn-crimson:hover {
+      background: var(--accent-crimson-hover);
+    }
+    .btn-white {
+      background: #fff;
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+    }
+    .btn-white:hover {
+      background: #f1f5f9;
+    }
+    .btn-sm {
+      padding: 4px 8px;
+      font-size: 10px;
+      border-radius: 4px;
+    }
+
+    /* Data Table */
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: right;
+      font-size: 12px;
+    }
+    table.data-table th {
+      background: #f8fafc;
+      color: #475569;
+      font-weight: 700;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 11px;
+    }
+    table.data-table td {
+      padding: 11px 16px;
+      border-bottom: 1px solid var(--border-subtle);
+      color: #1e293b;
+      vertical-align: middle;
+    }
+    table.data-table tr:hover td {
+      background: #f8fafc;
+    }
+    table.data-table tr.inactive td {
+      opacity: 0.55;
+    }
+
+    /* Badges */
+    .badge-pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 700;
+      border: 1px solid transparent;
+    }
+    .badge-green {
+      background: #ecfdf5;
+      color: #065f46;
+      border-color: #a7f3d0;
+    }
+    .badge-gray {
+      background: #f1f5f9;
+      color: #475569;
+      border-color: #cbd5e1;
+    }
+    .badge-red {
+      background: #fef2f2;
+      color: #991b1b;
+      border-color: #fecaca;
+    }
+    .badge-amber {
+      background: #fffbeb;
+      color: #92400e;
+      border-color: #fde68a;
+    }
+    .room-tag {
+      font-family: inherit;
+      background: #f1f5f9;
+      color: #334155;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    /* Modal Styling */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(2px);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.active {
+      display: flex;
+    }
+    .modal-card {
+      background: #fff;
+      border-radius: var(--radius-lg);
+      width: 580px;
+      max-width: 95%;
+      box-shadow: var(--shadow-modal);
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+      animation: modalPop 0.2s ease-out;
+    }
+    @keyframes modalPop {
+      from { transform: scale(0.96); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .modal-header {
+      padding: 14px 20px;
+      background: #092417;
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-header h3 {
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .modal-close {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      font-size: 16px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .modal-close:hover {
+      color: #fff;
+    }
+    .modal-body {
+      padding: 20px;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .form-group.full {
+      grid-column: span 2;
+    }
+    .form-label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      color: #334155;
+      margin-bottom: 5px;
+    }
+    .form-input, .form-select {
+      width: 100%;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 8px 10px;
+      font-size: 11px;
+      outline: none;
+      transition: border 0.15s;
+    }
+    .form-input:focus, .form-select:focus {
+      border-color: var(--brand-primary);
+    }
+    .modal-footer {
+      padding: 12px 20px;
+      background: #f8fafc;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: flex-start;
+      gap: 8px;
+    }
+
+    /* Toast Notification */
+    .toast-box {
+      position: fixed;
+      bottom: 24px;
+      left: 24px;
+      background: #0f172a;
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: var(--radius-md);
+      font-size: 12px;
+      font-weight: 600;
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.2);
+      border-right: 4px solid #10b981;
+      display: none;
+      z-index: 3000;
+      animation: slideIn 0.2s ease-out;
+    }
+    @keyframes slideIn {
+      from { transform: translateY(10px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Presentation Header for Client Demonstration -->
+  <header class="client-banner">
+    <div>
+      <span class="badge">العرض التقديمي المباشر</span>
+      <span>نظام مستشفى الراعي — نموذج الواجهة التفاعلي UI &amp; UX</span>
+    </div>
+    <div class="actions">
+      <button onclick="alert('هذه نسخة HTML مستقلة تماماً لا تحتاج إنترنت أو سيرفر لتشغيلها. يمكنك إرسالها للعميل مباشرة.')">معلومات النسخة</button>
+      <button onclick="window.print()">طباعة النموذج</button>
+    </div>
+  </header>
+
+  <div class="app-container">
+    
+    <!-- Sidebar (Developer-Built Minimalist Design without Icon Spam) -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="brand-mark">ر</div>
+        <div>
+          <div class="brand-title">مستشفى الراعي</div>
+          <div class="brand-subtitle">المنظومة الطبية والتشغيلية</div>
+        </div>
+      </div>
+
+      <nav class="nav-body">
+        <div class="nav-section">
+          <div class="nav-section-title">الاستقبال والمرضى</div>
+          <div class="nav-item active" onclick="switchTab('dashboard')">
+            <span>لوحة المتابعة</span>
+          </div>
+          <div class="nav-item" onclick="switchTab('patients')">
+            <span>سجل المرضى</span>
+          </div>
+          <div class="nav-item" onclick="switchTab('bookings')">
+            <span>الحجوزات والزيارات</span>
+          </div>
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-section-title">الخدمات والعيادات</div>
+          <div class="nav-item" onclick="switchTab('clinics')">
+            <span>العيادات التخصصية</span>
+            <span class="nav-tag">جديد</span>
+          </div>
+          <div class="nav-item" onclick="switchTab('services')">
+            <span>الخدمات العلاجية والأسعار</span>
+          </div>
+          <div class="nav-item" onclick="switchTab('doctors')">
+            <span>الأطباء والنسب</span>
+          </div>
+          <div class="nav-item" onclick="switchTab('lab')">
+            <span>المعمل والأشعة</span>
+          </div>
+          <div class="nav-item" onclick="switchTab('pharmacy')">
+            <span>الصيدلية والروشتات</span>
+          </div>
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-section-title">المالية والرقابة</div>
+          <div class="nav-item" onclick="switchTab('invoices')">
+            <span>الفواتير والخصومات</span>
+          </div>
+          <div class="nav-item" onclick="switchTab('cashier')">
+            <span>الخزينة والتحصيل</span>
+          </div>
+          <div class="nav-item" onclick="switchTab('insurance')">
+            <span>شركات التأمين</span>
+          </div>
+          <div class="nav-item" onclick="switchTab('commissions')">
+            <span>مستحقات الأطباء</span>
+          </div>
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-section-title">الإدارة والنظام</div>
+          <div class="nav-item" onclick="switchTab('reports')">
+            <span>التقارير والمحاسبة</span>
+          </div>
+          <div class="nav-item" onclick="switchTab('users')">
+            <span>المستخدمون والرقابة</span>
+          </div>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-pill">
+          <div class="user-avatar">م</div>
+          <div class="user-details">
+            <div class="uname">مدير النظام</div>
+            <div class="urole">صلاحيات كاملة • متصل</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Workspace -->
+    <main class="main-wrapper">
+      
+      <!-- Topbar -->
+      <div class="topbar">
+        <div class="topbar-left">
+          <span class="date-pill" id="today-date">الأربعاء، 18 نوفمبر 2026</span>
+          <span class="status-pill">
+            <span class="status-dot"></span>
+            الخادم متصل ونشط
+          </span>
+        </div>
+        <div class="topbar-right">
+          <button class="btn btn-white btn-sm" onclick="openClinicModal()">+ إضافة عيادة</button>
+          <button class="btn btn-primary btn-sm" onclick="switchTab('clinics')">إدارة العيادات</button>
+        </div>
+      </div>
+
+      <!-- Scrollable Views Container -->
+      <div class="view-container">
+
+        <!-- =================== VIEW 1: DASHBOARD =================== -->
+        <section id="view-dashboard" class="view-section active">
+          
+          <div class="hero-banner">
+            <div>
+              <h1>مرحباً بك في منظومة مستشفى الراعي</h1>
+              <p>نظام مركزي متكامل يربط الاستقبال، العيادات، المعمل، الصيدلية، والخزينة بدقة محاسبية عالية.</p>
+            </div>
+            <div class="hero-actions">
+              <button class="btn btn-white" onclick="switchTab('clinics')">جدول العيادات</button>
+              <button class="btn btn-crimson" onclick="openClinicModal()">+ حجز كشف مريض</button>
+            </div>
+          </div>
+
+          <!-- KPI Summary Strip -->
+          <div class="kpi-row">
+            <div class="kpi-card accent-green">
+              <div class="kpi-label">إجمالي المرضى المسجلين</div>
+              <div class="kpi-value">1,482</div>
+              <div class="kpi-hint">ملف طبي مؤرشف إلكترونياً</div>
+            </div>
+
+            <div class="kpi-card accent-red">
+              <div class="kpi-label">كشوفات وحجوزات اليوم</div>
+              <div class="kpi-value">64</div>
+              <div class="kpi-hint">عيادات خارجية وفحوصات</div>
+            </div>
+
+            <div class="kpi-card accent-slate">
+              <div class="kpi-label">المحصل في الخزينة اليوم</div>
+              <div class="kpi-value">28,450 <span style="font-size:12px; font-weight:normal;">ج.م</span></div>
+              <div class="kpi-hint">نقدياً وبطاقات دفع</div>
+            </div>
+
+            <div class="kpi-card accent-amber">
+              <div class="kpi-label">فواتير معلقة الدفع</div>
+              <div class="kpi-value">3</div>
+              <div class="kpi-hint">بانتظار سداد الخزينة</div>
+            </div>
+          </div>
+
+          <!-- Today's Active Clinics -->
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <div class="panel-title">العيادات التخصصية العاملة اليوم</div>
+                <div class="panel-sub">متابعة الطاقة الاستيعابية والأطباء المناوبين لحظياً</div>
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="switchTab('clinics')">عرض كل العيادات</button>
+            </div>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>اسم العيادة</th>
+                  <th>الموقع / الغرفة</th>
+                  <th>الطبيب المسؤول</th>
+                  <th>مواعيد العمل</th>
+                  <th>الحجوزات الحالية</th>
+                  <th>نسبة الإشغال</th>
+                  <th>الحالة</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>عيادة الأمراض الباطنية</strong></td>
+                  <td><span class="room-tag">غرفة 101 • الدور الأول</span></td>
+                  <td>د. أحمد محمد (استشاري باطنة)</td>
+                  <td dir="ltr">09:00 - 15:00</td>
+                  <td><strong>21</strong> من 25 كشف</td>
+                  <td>
+                    <span class="badge-pill badge-green">84% مكتمل</span>
+                  </td>
+                  <td><span class="badge-pill badge-green">نشطة</span></td>
+                </tr>
+                <tr>
+                  <td><strong>عيادة النساء والتوليد</strong></td>
+                  <td><span class="room-tag">غرفة 204 • الدور الثاني</span></td>
+                  <td>د. سارة علي (أخصائية نساء وتوليد)</td>
+                  <td dir="ltr">10:00 - 16:00</td>
+                  <td><strong>16</strong> من 20 كشف</td>
+                  <td>
+                    <span class="badge-pill badge-amber">80% مكتمل</span>
+                  </td>
+                  <td><span class="badge-pill badge-green">نشطة</span></td>
+                </tr>
+                <tr>
+                  <td><strong>عيادة الجراحة العامة</strong></td>
+                  <td><span class="room-tag">غرفة 105 • الدور الأول</span></td>
+                  <td>د. محمود حسن (استشاري جراحة)</td>
+                  <td dir="ltr">12:00 - 18:00</td>
+                  <td><strong>9</strong> من 15 كشف</td>
+                  <td>
+                    <span class="badge-pill badge-gray">60% مكتمل</span>
+                  </td>
+                  <td><span class="badge-pill badge-green">نشطة</span></td>
+                </tr>
+                <tr>
+                  <td><strong>عيادة طب الأطفال وحديثي الولادة</strong></td>
+                  <td><span class="room-tag">غرفة 102 • الدور الأول</span></td>
+                  <td>د. منى الشريف (أخصائية أطفال)</td>
+                  <td dir="ltr">11:00 - 17:00</td>
+                  <td><strong>14</strong> من 20 كشف</td>
+                  <td>
+                    <span class="badge-pill badge-green">70% مكتمل</span>
+                  </td>
+                  <td><span class="badge-pill badge-green">نشطة</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Recent Patients & Invoices Row -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="panel">
+              <div class="panel-header">
+                <div class="panel-title">آخر المرضى المترددين</div>
+                <button class="btn btn-white btn-sm" onclick="switchTab('patients')">سجل المرضى</button>
+              </div>
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>اسم المريض</th>
+                    <th>العيادة المطلوبة</th>
+                    <th>التأمين</th>
+                    <th>الحالة</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>محمد عبد الله السيد</strong></td>
+                    <td>باطنة عامة</td>
+                    <td><span class="badge-pill badge-gray">نقدي</span></td>
+                    <td><span class="badge-pill badge-green">تم الكشف</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>فاطمة أحمد حسن</strong></td>
+                    <td>نساء وتوليد</td>
+                    <td><span class="badge-pill badge-green">بوبا مصر</span></td>
+                    <td><span class="badge-pill badge-amber">بالانتظار</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>إبراهيم خليل محمد</strong></td>
+                    <td>جراحة عامة</td>
+                    <td><span class="badge-pill badge-gray">نقدي</span></td>
+                    <td><span class="badge-pill badge-green">تم الكشف</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="panel">
+              <div class="panel-header">
+                <div class="panel-title">حركة الخزينة والتحصيل اليوم</div>
+                <button class="btn btn-white btn-sm" onclick="switchTab('invoices')">كافة الفواتير</button>
+              </div>
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>رقم الفاتورة</th>
+                    <th>المريض</th>
+                    <th>المبلغ</th>
+                    <th>وسيلة الدفع</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>#INV-1082</td>
+                    <td>محمود جمال الدين</td>
+                    <td><strong>350 ج.م</strong></td>
+                    <td>نقداً (خزينة 1)</td>
+                  </tr>
+                  <tr>
+                    <td>#INV-1081</td>
+                    <td>سارة طارق فؤاد</td>
+                    <td><strong>680 ج.م</strong></td>
+                    <td>فيزا / بطاقة بنكية</td>
+                  </tr>
+                  <tr>
+                    <td>#INV-1080</td>
+                    <td>كريم أحمد الشاذلي</td>
+                    <td><strong>250 ج.م</strong></td>
+                    <td>نقداً (خزينة 1)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- =================== VIEW 2: CLINICS MANAGEMENT =================== -->
+        <section id="view-clinics" class="view-section">
+          
+          <div class="panel-header" style="background: none; padding: 0 0 16px 0; border: none;">
+            <div>
+              <h2 style="font-size: 16px; font-weight: 800; color: #0f172a;">إدارة العيادات التخصصية</h2>
+              <p style="font-size: 11px; color: #64748b;">تحديد العيادات، أرقام الغرف، الأطباء المسؤولين، وساعات العمل اليومية</p>
+            </div>
+            <button class="btn btn-primary" onclick="openClinicModal()">+ إضافة عيادة جديدة</button>
+          </div>
+
+          <!-- Clinics KPI Strip -->
+          <div class="kpi-row" style="grid-template-columns: repeat(3, 1fr);">
+            <div class="kpi-card accent-green">
+              <div class="kpi-label">إجمالي العيادات المجهزة</div>
+              <div class="kpi-value" id="kpi-total-clinics">6 عيادات</div>
+              <div class="kpi-hint">موزعة على الدور الأول والثاني</div>
+            </div>
+            <div class="kpi-card accent-green">
+              <div class="kpi-label">العيادات النشطة حالياً</div>
+              <div class="kpi-value" id="kpi-active-clinics">5 عيادات</div>
+              <div class="kpi-hint">جاهزة لاستقبال المرضى</div>
+            </div>
+            <div class="kpi-card accent-red">
+              <div class="kpi-label">إجمالي الطاقة اليومية</div>
+              <div class="kpi-value">125 كشف/يوم</div>
+              <div class="kpi-hint">بمتوسط 20-25 كشف لكل عيادة</div>
+            </div>
+          </div>
+
+          <!-- Table Container -->
+          <div class="panel">
+            <div class="filter-bar">
+              <input type="text" id="clinic-search" class="search-input" placeholder="بحث باسم العيادة، الطبيب، أو رقم الغرفة..." onkeyup="filterClinicsTable()">
+              <div style="display: flex; gap: 8px;">
+                <select id="clinic-status-filter" class="select-filter" onchange="filterClinicsTable()">
+                  <option value="all">كل الحالات</option>
+                  <option value="active">النشطة فقط</option>
+                  <option value="inactive">الموقوفة فقط</option>
+                </select>
+              </div>
+            </div>
+
+            <table class="data-table" id="clinics-table">
+              <thead>
+                <tr>
+                  <th>اسم العيادة</th>
+                  <th>الموقع / الغرفة</th>
+                  <th>الطبيب المسؤول</th>
+                  <th>مواعيد العمل</th>
+                  <th>أيام العمل</th>
+                  <th>الطاقة اليومية</th>
+                  <th>الحالة</th>
+                  <th>الإجراءات</th>
+                </tr>
+              </thead>
+              <tbody id="clinics-tbody">
+                <tr>
+                  <td><strong>عيادة الأمراض الباطنية</strong></td>
+                  <td><span class="room-tag">غرفة 101 • الدور الأول</span></td>
+                  <td>
+                    <div><strong>د. أحمد محمد</strong></div>
+                    <div style="font-size: 10px; color: var(--brand-primary); font-weight: 600;">استشاري باطنة وجهاز هضمي</div>
+                  </td>
+                  <td dir="ltr">09:00 - 15:00</td>
+                  <td>السبت، الاثنين، الأربعاء</td>
+                  <td><strong>25 كشف</strong></td>
+                  <td><span class="badge-pill badge-green">نشطة</span></td>
+                  <td>
+                    <button class="btn btn-white btn-sm" onclick="showToast('تم فتح شاشة التعديل للعيادة')">تعديل</button>
+                    <button class="btn btn-white btn-sm" onclick="toggleClinicRow(this)">إيقاف</button>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td><strong>عيادة النساء والتوليد</strong></td>
+                  <td><span class="room-tag">غرفة 204 • الدور الثاني</span></td>
+                  <td>
+                    <div><strong>د. سارة علي</strong></div>
+                    <div style="font-size: 10px; color: var(--brand-primary); font-weight: 600;">أخصائية نساء وتوليد</div>
+                  </td>
+                  <td dir="ltr">10:00 - 16:00</td>
+                  <td>الأحد، الثلاثاء، الخميس</td>
+                  <td><strong>20 كشف</strong></td>
+                  <td><span class="badge-pill badge-green">نشطة</span></td>
+                  <td>
+                    <button class="btn btn-white btn-sm" onclick="showToast('تم فتح شاشة التعديل للعيادة')">تعديل</button>
+                    <button class="btn btn-white btn-sm" onclick="toggleClinicRow(this)">إيقاف</button>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td><strong>عيادة الجراحة العامة</strong></td>
+                  <td><span class="room-tag">غرفة 105 • الدور الأول</span></td>
+                  <td>
+                    <div><strong>د. محمود حسن</strong></div>
+                    <div style="font-size: 10px; color: var(--brand-primary); font-weight: 600;">استشاري جراحة عامة</div>
+                  </td>
+                  <td dir="ltr">12:00 - 18:00</td>
+                  <td>يومياً عدا الجمعة</td>
+                  <td><strong>15 كشف</strong></td>
+                  <td><span class="badge-pill badge-green">نشطة</span></td>
+                  <td>
+                    <button class="btn btn-white btn-sm" onclick="showToast('تم فتح شاشة التعديل للعيادة')">تعديل</button>
+                    <button class="btn btn-white btn-sm" onclick="toggleClinicRow(this)">إيقاف</button>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td><strong>عيادة العظام والمفاصل</strong></td>
+                  <td><span class="room-tag">غرفة 103 • الدور الأول</span></td>
+                  <td>
+                    <div><strong>د. طارق كامل</strong></div>
+                    <div style="font-size: 10px; color: var(--brand-primary); font-weight: 600;">استشاري جراحة العظام</div>
+                  </td>
+                  <td dir="ltr">14:00 - 20:00</td>
+                  <td>السبت، الثلاثاء، الخميس</td>
+                  <td><strong>25 كشف</strong></td>
+                  <td><span class="badge-pill badge-green">نشطة</span></td>
+                  <td>
+                    <button class="btn btn-white btn-sm" onclick="showToast('تم فتح شاشة التعديل للعيادة')">تعديل</button>
+                    <button class="btn btn-white btn-sm" onclick="toggleClinicRow(this)">إيقاف</button>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td><strong>عيادة طب الأطفال</strong></td>
+                  <td><span class="room-tag">غرفة 102 • الدور الأول</span></td>
+                  <td>
+                    <div><strong>د. منى الشريف</strong></div>
+                    <div style="font-size: 10px; color: var(--brand-primary); font-weight: 600;">أخصائية أطفال وحديثي الولادة</div>
+                  </td>
+                  <td dir="ltr">11:00 - 17:00</td>
+                  <td>طوال أيام الأسبوع</td>
+                  <td><strong>20 كشف</strong></td>
+                  <td><span class="badge-pill badge-green">نشطة</span></td>
+                  <td>
+                    <button class="btn btn-white btn-sm" onclick="showToast('تم فتح شاشة التعديل للعيادة')">تعديل</button>
+                    <button class="btn btn-white btn-sm" onclick="toggleClinicRow(this)">إيقاف</button>
+                  </td>
+                </tr>
+
+                <tr class="inactive">
+                  <td><strong>عيادة الأسنان وجراحة الفم</strong></td>
+                  <td><span class="room-tag">غرفة 208 • الدور الثاني</span></td>
+                  <td>
+                    <div style="color: #94a3b8; font-style: italic;">بانتظار تعيين طبيب</div>
+                  </td>
+                  <td dir="ltr">10:00 - 14:00</td>
+                  <td>الأحد، الأربعاء</td>
+                  <td><strong>20 كشف</strong></td>
+                  <td><span class="badge-pill badge-gray">موقوفة صيانة</span></td>
+                  <td>
+                    <button class="btn btn-white btn-sm" onclick="showToast('تم فتح شاشة التعديل للعيادة')">تعديل</button>
+                    <button class="btn btn-white btn-sm" onclick="toggleClinicRow(this)">تفعيل</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </section>
+
+        <!-- =================== VIEW 3: SERVICES & PRICING =================== -->
+        <section id="view-services" class="view-section">
+          
+          <div class="panel-header" style="background: none; padding: 0 0 16px 0; border: none;">
+            <div>
+              <h2 style="font-size: 16px; font-weight: 800; color: #0f172a;">قائمة الخدمات العلاجية والتسعير</h2>
+              <p style="font-size: 11px; color: #64748b;">الأسعار الأساسية لجميع كشوفات العيادات، الفحوصات، التحاليل، وخدمات الطوارئ</p>
+            </div>
+            <button class="btn btn-primary" onclick="showToast('نموذج إضافة خدمة جديدة جاهز')">+ إضافة خدمة جديدة</button>
+          </div>
+
+          <div class="panel">
+            <div class="filter-bar">
+              <input type="text" class="search-input" placeholder="بحث في الخدمات العلاجية...">
+              <select class="select-filter">
+                <option value="all">كل الأقسام الطبية</option>
+                <option value="clinic">كشوفات العيادات</option>
+                <option value="lab">تحاليل المعمل</option>
+                <option value="radiology">فحوصات الأشعة</option>
+              </select>
+            </div>
+
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>كود الخدمة</th>
+                  <th>اسم الخدمة أو الفحص</th>
+                  <th>القسم الطبي</th>
+                  <th>السعر الأساسي</th>
+                  <th>تغطية التأمين</th>
+                  <th>الحالة</th>
+                  <th>الإجراءات</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>SRV-01</code></td>
+                  <td><strong>كشف استشاري باطنة</strong></td>
+                  <td><span class="badge-pill badge-green">العيادات التخصصية</span></td>
+                  <td><strong>300 ج.م</strong></td>
+                  <td>مغطى بنسبة 80%</td>
+                  <td><span class="badge-pill badge-green">مفعل</span></td>
+                  <td><button class="btn btn-white btn-sm">تعديل</button></td>
+                </tr>
+                <tr>
+                  <td><code>SRV-02</code></td>
+                  <td><strong>كشف أخصائي أطفال</strong></td>
+                  <td><span class="badge-pill badge-green">العيادات التخصصية</span></td>
+                  <td><strong>250 ج.م</strong></td>
+                  <td>مغطى بنسبة 80%</td>
+                  <td><span class="badge-pill badge-green">مفعل</span></td>
+                  <td><button class="btn btn-white btn-sm">تعديل</button></td>
+                </tr>
+                <tr>
+                  <td><code>LAB-01</code></td>
+                  <td><strong>صورة دم كاملة (CBC)</strong></td>
+                  <td><span class="badge-pill badge-amber">المعمل المركزي</span></td>
+                  <td><strong>180 ج.م</strong></td>
+                  <td>مغطى بالكامل</td>
+                  <td><span class="badge-pill badge-green">مفعل</span></td>
+                  <td><button class="btn btn-white btn-sm">تعديل</button></td>
+                </tr>
+                <tr>
+                  <td><code>LAB-04</code></td>
+                  <td><strong>وظائف كبد وكلى كاملة</strong></td>
+                  <td><span class="badge-pill badge-amber">المعمل المركزي</span></td>
+                  <td><strong>420 ج.م</strong></td>
+                  <td>مغطى بنسبة 90%</td>
+                  <td><span class="badge-pill badge-green">مفعل</span></td>
+                  <td><button class="btn btn-white btn-sm">تعديل</button></td>
+                </tr>
+                <tr>
+                  <td><code>RAD-02</code></td>
+                  <td><strong>أشعة سينية على الصدر (X-Ray)</strong></td>
+                  <td><span class="badge-pill badge-gray">قسم الأشعة</span></td>
+                  <td><strong>220 ج.م</strong></td>
+                  <td>مغطى بنسبة 85%</td>
+                  <td><span class="badge-pill badge-green">مفعل</span></td>
+                  <td><button class="btn btn-white btn-sm">تعديل</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </section>
+
+        <!-- =================== VIEW 4: DOCTORS =================== -->
+        <section id="view-doctors" class="view-section">
+          <div class="panel-header" style="background: none; padding: 0 0 16px 0; border: none;">
+            <div>
+              <h2 style="font-size: 16px; font-weight: 800; color: #0f172a;">الأطباء ونسب المستحقات</h2>
+              <p style="font-size: 11px; color: #64748b;">إدارة كادر الأطباء الاستشاريين والأخصائيين ونسب عمولات الكشف والتحاليل</p>
+            </div>
+            <button class="btn btn-primary" onclick="showToast('نموذج إضافة طبيب جديد')">+ إضافة طبيب</button>
+          </div>
+
+          <div class="panel">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>اسم الطبيب</th>
+                  <th>التخصص</th>
+                  <th>نسبة الكشف</th>
+                  <th>نسبة المعمل</th>
+                  <th>نسبة الأشعة</th>
+                  <th>إجمالي مستحقات الشهر</th>
+                  <th>الحالة</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>د. أحمد محمد</strong></td>
+                  <td>باطنة وجهاز هضمي</td>
+                  <td><strong>30%</strong></td>
+                  <td>5%</td>
+                  <td>5%</td>
+                  <td><strong>12,450 ج.م</strong></td>
+                  <td><span class="badge-pill badge-green">نشط</span></td>
+                </tr>
+                <tr>
+                  <td><strong>د. سارة علي</strong></td>
+                  <td>نساء وتوليد</td>
+                  <td><strong>35%</strong></td>
+                  <td>5%</td>
+                  <td>5%</td>
+                  <td><strong>14,800 ج.م</strong></td>
+                  <td><span class="badge-pill badge-green">نشط</span></td>
+                </tr>
+                <tr>
+                  <td><strong>د. محمود حسن</strong></td>
+                  <td>جراحة عامة</td>
+                  <td><strong>40%</strong></td>
+                  <td>0%</td>
+                  <td>10%</td>
+                  <td><strong>18,200 ج.م</strong></td>
+                  <td><span class="badge-pill badge-green">نشط</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Generic Placeholder for other modules -->
+        <section id="view-generic" class="view-section">
+          <div class="panel" style="padding: 40px; text-align: center;">
+            <h3 id="generic-title" style="font-size: 15px; font-weight: 800; margin-bottom: 8px;">القسم الطبي</h3>
+            <p style="font-size: 12px; color: #64748b; max-width: 400px; margin: 0 auto 16px;">تم ربط هذا القسم بالكامل مع قاعدة بيانات المنظومة المركزية لمستشفى الراعي.</p>
+            <button class="btn btn-primary" onclick="switchTab('dashboard')">العودة للوحة المتابعة</button>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Interactive Modal for Adding a New Clinic -->
+  <div id="clinic-modal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>+ إضافة عيادة تخصصية جديدة</h3>
+        <button class="modal-close" onclick="closeClinicModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="add-clinic-form" onsubmit="saveNewClinic(event)">
+          <div class="form-grid">
+            <div class="form-group full">
+              <label class="form-label">اسم العيادة <span style="color:red;">*</span></label>
+              <input type="text" id="m-name" class="form-input" placeholder="مثال: عيادة القلب والأوعية الدموية" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">رقم الغرفة</label>
+              <input type="text" id="m-room" class="form-input" placeholder="مثال: 106">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">الدور / الطابق</label>
+              <input type="text" id="m-floor" class="form-input" placeholder="مثال: الدور الأول">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">الطبيب المسؤول الأساسي</label>
+              <select id="m-doctor" class="form-select">
+                <option value="د. حسام الشريف (قلب وأوعية)">د. حسام الشريف (قلب وأوعية)</option>
+                <option value="د. أحمد محمد (باطنة)">د. أحمد محمد (باطنة)</option>
+                <option value="د. سارة علي (نساء وتوليد)">د. سارة علي (نساء وتوليد)</option>
+                <option value="د. محمود حسن (جراحة)">د. محمود حسن (جراحة)</option>
+                <option value="بدون طبيب محدد (تناوبي)">بدون طبيب محدد (تناوبي)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">الطاقة اليومية (عدد الكشوفات)</label>
+              <input type="number" id="m-capacity" class="form-input" value="20" min="1" max="100">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">ساعة البدء</label>
+              <input type="time" id="m-start" class="form-input" value="09:00">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">ساعة الانتهاء</label>
+              <input type="time" id="m-end" class="form-input" value="15:00">
+            </div>
+
+            <div class="form-group full">
+              <label class="form-label">أيام العمل</label>
+              <input type="text" id="m-days" class="form-input" value="السبت، الاثنين، الأربعاء">
+            </div>
+          </div>
+
+          <div class="modal-footer" style="margin-top: 18px; padding: 12px 0 0 0; background: none; border-top: 1px solid #e2e8f0;">
+            <button type="submit" class="btn btn-primary">حفظ وإضافة العيادة</button>
+            <button type="button" class="btn btn-white" onclick="closeClinicModal()">إلغاء</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Box -->
+  <div id="toast" class="toast-box">
+    تم حفظ البيانات بنجاح!
+  </div>
+
+  <!-- Interactive JavaScript -->
+  <script>
+    // Tab switching logic
+    function switchTab(tabKey) {
+      // Update nav styling
+      const items = document.querySelectorAll('.nav-item');
+      items.forEach(el => el.classList.remove('active'));
+      
+      // Match active item
+      const clicked = Array.from(items).find(el => el.textContent.includes(getTabLabel(tabKey)));
+      if (clicked) clicked.classList.add('active');
+
+      // Hide all views
+      const sections = document.querySelectorAll('.view-section');
+      sections.forEach(s => s.classList.remove('active'));
+
+      // Show targeted view
+      const target = document.getElementById('view-' + tabKey);
+      if (target) {
+        target.classList.add('active');
+      } else {
+        const generic = document.getElementById('view-generic');
+        document.getElementById('generic-title').textContent = getTabLabel(tabKey);
+        generic.classList.add('active');
+      }
+    }
+
+    function getTabLabel(key) {
+      const labels = {
+        'dashboard': 'لوحة المتابعة',
+        'clinics': 'العيادات التخصصية',
+        'services': 'الخدمات العلاجية والأسعار',
+        'doctors': 'الأطباء والنسب',
+        'patients': 'سجل المرضى',
+        'bookings': 'الحجوزات والزيارات',
+        'invoices': 'الفواتير والخصومات',
+        'cashier': 'الخزينة والتحصيل',
+        'insurance': 'شركات التأمين',
+        'commissions': 'مستحقات الأطباء',
+        'lab': 'المعمل والأشعة',
+        'pharmacy': 'الصيدلية والروشتات',
+        'reports': 'التقارير والمحاسبة',
+        'users': 'المستخدمون والرقابة'
+      };
+      return labels[key] || 'القسم';
+    }
+
+    // Modal controls
+    function openClinicModal() {
+      document.getElementById('clinic-modal').classList.add('active');
+    }
+    function closeClinicModal() {
+      document.getElementById('clinic-modal').classList.remove('active');
+    }
+
+    // Add new clinic row dynamically
+    function saveNewClinic(e) {
+      e.preventDefault();
+      const name = document.getElementById('m-name').value;
+      const room = document.getElementById('m-room').value;
+      const floor = document.getElementById('m-floor').value;
+      const doc = document.getElementById('m-doctor').value;
+      const capacity = document.getElementById('m-capacity').value;
+      const start = document.getElementById('m-start').value;
+      const end = document.getElementById('m-end').value;
+      const days = document.getElementById('m-days').value;
+
+      const tbody = document.getElementById('clinics-tbody');
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><strong>${name}</strong></td>
+        <td><span class="room-tag">${room ? 'غرفة ' + room : ''} ${floor ? '• ' + floor : ''}</span></td>
+        <td>
+          <div><strong>${doc}</strong></div>
+          <div style="font-size: 10px; color: var(--brand-primary); font-weight: 600;">طبيب أساسي</div>
+        </td>
+        <td dir="ltr">${start} - ${end}</td>
+        <td>${days}</td>
+        <td><strong>${capacity} كشف</strong></td>
+        <td><span class="badge-pill badge-green">نشطة</span></td>
+        <td>
+          <button class="btn btn-white btn-sm" onclick="showToast('تم فتح شاشة التعديل')">تعديل</button>
+          <button class="btn btn-white btn-sm" onclick="toggleClinicRow(this)">إيقاف</button>
+        </td>
+      `;
+      tbody.prepend(tr);
+
+      closeClinicModal();
+      switchTab('clinics');
+      showToast('تمت إضافة العيادة بنجاح إلى جدول العيادات!');
+      document.getElementById('add-clinic-form').reset();
+    }
+
+    // Toggle row active / inactive
+    function toggleClinicRow(btn) {
+      const row = btn.closest('tr');
+      const badge = row.querySelector('.badge-pill');
+      if (row.classList.contains('inactive')) {
+        row.classList.remove('inactive');
+        badge.className = 'badge-pill badge-green';
+        badge.textContent = 'نشطة';
+        btn.textContent = 'إيقاف';
+        showToast('تم تفعيل العيادة بنجاح');
+      } else {
+        row.classList.add('inactive');
+        badge.className = 'badge-pill badge-gray';
+        badge.textContent = 'موقوفة';
+        btn.textContent = 'تفعيل';
+        showToast('تم إيقاف تفعيل العيادة');
+      }
+    }
+
+    // Table search filter
+    function filterClinicsTable() {
+      const term = document.getElementById('clinic-search').value.toLowerCase();
+      const statusFilter = document.getElementById('clinic-status-filter').value;
+      const rows = document.querySelectorAll('#clinics-tbody tr');
+
+      rows.forEach(r => {
+        const text = r.textContent.toLowerCase();
+        const isInactive = r.classList.contains('inactive');
+        let statusMatch = true;
+        if (statusFilter === 'active') statusMatch = !isInactive;
+        if (statusFilter === 'inactive') statusMatch = isInactive;
+
+        const termMatch = text.includes(term);
+        if (statusMatch && termMatch) {
+          r.style.display = '';
+        } else {
+          r.style.display = 'none';
+        }
+      });
+    }
+
+    // Toast alert helper
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.style.display = 'block';
+      setTimeout(() => {
+        toast.style.display = 'none';
+      }, 3000);
+    }
+  </script>
+</body>
+</html>
